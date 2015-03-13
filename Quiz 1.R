@@ -47,6 +47,8 @@ sum(zipcodes == 21231)## counts the number of 21231s in zipcodes
 
 ###########################################Question 5##########################################
 
+setwd("C:/Users/Dangermonger/Documents/GitHub/Getting-and-Cleaning-Data")
+
 fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06pid.csv" 
 download.file(fileUrl, destfile = "./getdata-data-ss06pid.csv")
 dateDownloaded <- date()
@@ -56,27 +58,30 @@ install.packages("data.table")
 library(data.table)
 
 readfile <- read.csv("getdata-data-ss06pid.csv", colClasses = "character")
+str(readfile)
 
-DT = data.table(readfile)##converts readfile dataframe into a data table
-str(DT)
+convertDT <- data.table(readfile)##converts readfile dataframe into a data table
+tables()
+
+DT <- convertDT[, pwgtp15:=as.numeric(pwgtp15)]
+
+# Example average pwgt15 by SEX
+DT2 <- as.data.frame(DT[, mean(pwgtp15, na.rm = TRUE),by = SEX])
+
+##WRONG slightly slower than 3 - option1 <- tapply(DT$pwgtp15,DT$SEX,mean)
+##WRONG too slow - option2 <- DT[,mean(pwgtp15),by=SEX]
+option3 <- sapply(split(DT$pwgtp15,DT$SEX),mean)
+##WRONG, gives mean of both together - option4 <- mean(DT$pwgtp15,by=DT$SEX)
+##WRONG, gives second result of expression only - option5 <- mean(DT[DT$SEX==1,]$pwgtp15); mean(DT[DT$SEX==2,]$pwgtp15)
+#WRONG, gives no result, doesn't reference pwgtp15 - option6 <- rowMeans(DT)[DT$SEX==1]; rowMeans(DT)[DT$SEX==2]
+
+system.time( replicate(100000, DT2) ) 
+
+system.time( replicate(1000000, option1) ) 
+##system.time( replicate(100000, option2) ) 
+system.time( replicate(1000000, option3) ) 
 
 
-option1 <- tapply(DT$pwgtp15,DT$SEX,mean)
-file <- tempfile()
-write.table(option1, file=file, row.names=FALSE, col.names=TRUE, sep="\t", quote=FALSE)
-system.time(fread(file))
 
-option1 <- tapply(DT$pwgtp15,DT$SEX,mean)
-
-system.time(fread(file)))
-            
-tapply(DT$pwgtp15,DT$SEX,mean)
-
-ptm <- proc.time()##start timer
-g <- rnorm(10)## a list of ten random numbers
-h <- rep(NA, 10)## an empty list of ten
-for (i in 1:10){ ## for every i in the range
-  h[i] <- g[i] + 2 ## the empty list is populated by g + 1
-}
-proc.time() - ptm ##end timer
+## option 3 correct
 

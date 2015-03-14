@@ -1,12 +1,21 @@
 ############################################# Question 1 ##############################################################
 
-setwd("C:/Users/KOLeary/Documents/GitHub/Getting and Cleaning Data")
+##WORK setwd("C:/Users/KOLeary/Documents/GitHub/Getting and Cleaning Data")
+setwd("C:/Users/Dangermonger/Documents/GitHub/Getting-and-Cleaning-Data")
 
 library(httr)
 ##install.packages("jsonlite")
 ##install.packages("httpuv")
 library(jsonlite)
 library(httpuv)
+
+############################################## UPDATING R ######################################
+if(!require(installr)) {
+  install.packages("installr"); require(installr)} #load / install+load installr
+
+updateR()
+
+################################################################################################
 
 ##remove.packages("Rcpp")
 ##install.packages("Rcpp")
@@ -44,8 +53,9 @@ new <- json2[44:45]
 str(new)
 class(new)
 colnames(new)
+new
 
-##Couldn't subset further.
+new[5,]
 
 
 #################################################### Question 2 ######################################################

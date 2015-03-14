@@ -32,3 +32,16 @@ sort(X$var2,na.last=TRUE) ##sort, leaving NAs to last
 X[order(X$var1),] ##order dataframe by first column
 
 X[order(X$var1,X$var3),] ##order by first column and then by third
+
+################################ORDERING WITH PLYR##############################
+
+library(plyr)
+arrange(X,var1) ##arrange dataframe by first variable (column)
+
+arrange(X,desc(var1)) ##arrange first variable in descending order
+
+X$var4 <- rnorm(5) ##add fourth column
+X 
+
+Y <- cbind(X,rnorm(5)) ## bind a column to the right side of X (rbind to bind rows)
+Y

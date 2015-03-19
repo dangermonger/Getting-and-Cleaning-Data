@@ -1,17 +1,21 @@
 setwd("C:/Users/Dangermonger/Documents/GitHub/Getting-and-Cleaning-Data/UCI HAR Dataset/train")
 
-mydata = read.table("X_train.txt")
-dim(mydata)
-class(mydata)
+library(plyr)
+library(dplyr)
 
-volcol = read.table("subject_train.txt")
-dim(volcol)
+xtrain = read.table("X_train.txt") ##read training dataframe 
+xtrainid = mutate(xtrain,id=1:7352) ##add an id column
 
-typeact = read.table("y_train.txt")
-dim(typeact)
+voluncol = read.table("subject_train.txt") ##read volunteer identifying dataframe 
+volunid = mutate(voluncol,id=1:7352) ##add an id column
 
-read all data into r
-examine files to find id columns
+typeact = read.table("y_train.txt") ##read activity type dataframe 
+typeactid = mutate(typeact,id=1:7352) ##add an id column
+
+merge1 = merge(typeactid, volunid,by.x="id",by.y="id",all=TRUE)
+
+merge2 = merge(merge1, xtrainid, by.x = 'id', by.y="id", all=TRUE)
+
 
 merge (concatenate) the activity datasets, merge the (concatenate) the measurement datasets
 

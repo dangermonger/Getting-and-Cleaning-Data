@@ -35,65 +35,35 @@ download.file(gdpdata, destfile = "./getdata-data-GDP.csv", mode="wb")
 edata <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FEDSTATS_Country.csv" 
 download.file(edata, destfile = "./getdata-data-EDSTATS_Country.csv", mode="wb")
 
-readgdp <- read.csv("getdata-data-GDP.csv", colClasses = "character", skip=4) ##skip the top four rows
-readedata <- read.csv("getdata-data-EDSTATS_Country.csv", colClasses = "character")
+readgdp <- read.csv("getdata-data-GDP.csv", skip=4, nrows = 190) ##skip the top four rows and reads only the first 190 lines
+readedata <- read.csv("getdata-data-EDSTATS_Country.csv")
 
-match_tables <- data.frame(matchcol = match(readgdp$X, readedata$CountryCode)) ##creates a dataframe of matched columns with a named column
-str(match_tables)
-colnames(match_tables)
+match_tables <- data.frame(matchcol = match(readgdp$X, readedata$CountryCode), Country = readgdp$X.3) ##creates a dataframe of matched columns with a named column
+na.omit(match_tables) ## results in 190 observations
+tail(match_tables, 13)
+match_tables <- arrange(match_tables, matchcol) 
+
+################################################Question 4######################################
+
+gdpave <- data.frame(matchcol = match(readedata$CountryCode, readgdp$X), CountryCode = readedata$CountryCode, IncomeGroup = readedata$Income.Group, CountryName = readedata$Short.Name) ##create a dataframe of revelant columns
 
 library(dplyr)
-match_tables <- arrange(match_tables, desc(matchcol))
-head(match_tables)
-
-convertbl <- tbl_df(readgdp) ## convert table to tbl
-rm("readgdp") ## remove other handle
-convertbl ##print converted table
-arrange(convertbl, X.1)
-
-
-class(convertbl)
-str(convertbl)
+convertbl <- tbl_df(gdpave) ## convert table to tbl
+rm("gdpave") ## remove other handle
+match_tables <- arrange(convertbl, matchcol) ##arrange convertbl by matchcol column
+highink <- filter(convertbl, IncomeGroup == "High income: OECD") ##filter the rows by High Income
+highinknon <- filter(convertbl, IncomeGroup == "High income: nonOECD") ##filter the rows by nonOECD
+nonas <- na.omit(highinknon) ##remove nas from highinknon
 
 
+mean(highink$matchcol) ##calculate mean of matchcol
+mean(nonas$matchcol) ##calculate mean of matchcol
+
+################################################Question 5######################################
 
 
+nonatable <- na.omit(match_tables) ##remove nas from match_tables
+headtable <- head(nonatable, 38) ##create table of the first 38 rows
+howink <- filter(headtable, IncomeGroup == "Lower middle income") ##answer = 5
 
-
-
-
-
-
-head(readgdp)
-
-readgdp <- arrange(readgdp, desc(X.1))
-
-## merge datasets and in descending order by GDP rank 
-
-
-match(readedata$CountryCode, readgdp$X)
-
-mergedData = merge(readgdp, readedata, by.x="X.4", by.y="Short.Name")
-
-library(plyr)
-
-join(readgdp, readedata, by = "Short.Name")
-arrange(join(readgdp, readedata), Short.Name)
-
-library(dplyr) ##bring up dplr library
-convertbl <- tbl_df(new) ## convert table to tbl
-rm("readgdp") ## remove other handle
-convertbl ##print converted table
-select(convertbl, column1, column2)## for columns
-filter(convertbl, column1 == "value1", column2 == "value2") ## for finding row information
-
-x <- c("a","b","c",4,5,6,8)
-y <- c("a","b","c",4,8,9,0)
-match(x, y)
-
-bob <- data.frame(bob = c(3,2,1))
-arrange(bob, bob$1)
-tom <- data.frame(tom = c("UK", "AU", "US"))
-
-match(tom$tom, bob$bob) ##order is important here!!
 

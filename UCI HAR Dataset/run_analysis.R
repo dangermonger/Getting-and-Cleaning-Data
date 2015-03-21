@@ -1,8 +1,14 @@
-##HOME -- setwd("C:/Users/Dangermonger/Documents/GitHub/Getting-and-Cleaning-Data/UCI HAR Dataset")
-setwd("C:/Users/KOLeary/Documents/GitHub/Getting and Cleaning Data/UCI HAR Dataset")
+setwd("C:/Users/Dangermonger/Documents/GitHub/Getting-and-Cleaning-Data")
 
-library(plyr)
-library(dplyr)
+fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip" 
+
+download.file(fileUrl, destfile = "./getdata-projectfiles-FUCHI-HAR-Dataset.zip")
+
+unzip("./getdata-projectfiles-FUCHI-HAR-Dataset.zip")
+
+setwd("C:/Users/Dangermonger/Documents/GitHub/Getting-and-Cleaning-Data/UCI HAR Dataset")
+
+library(dplyr) ##load dplyr package
 
 trainact = read.table("./train/y_train.txt") ##types of activities - train
 
@@ -16,50 +22,33 @@ traindata = read.table("./train/X_train.txt") ##data - train
 
 testdata = read.table("./test/X_test.txt") ##data - test
 
-appendact <- rbind(trainact, testact) ##appended activity dataframes
-appendvol <- rbind(trainvol, testvol) ##appended volunteer dataframes
-appendata <- rbind(traindata, testdata) ##appended data dataframes
+appendact <- rbind(trainact, testact) ##append activity dataframes
+appendvol <- rbind(trainvol, testvol) ##append volunteer dataframes
+appendata <- rbind(traindata, testdata) ##append data dataframes
 
-features = read.table("./features.txt", colClasses=c("NULL",NA)) ##reads only the second column of features
+features = read.table("./features.txt", colClasses=c("NULL",NA)) ##read only the second column of features
 transpdata = t(features) ##transpose features into a character list
-datacols <- make.names(datacols, unique = TRUE, allow_ = TRUE) ##coerces list into valid column names
+datacols <- make.names(transpdata, unique = TRUE, allow_ = TRUE) ##coerce list into valid column names
 
-colnames(appendata) <- datacols ##changes colnames of appendata to  datacols list
+colnames(appendata) <- datacols ##change column names of appendata to  datacols list
 colnames(appendvol) <- "Volunteer_ID" ##change column name
-colnames(appendact) <- "Activity_ID" ##change column name
+colnames(appendact) <- "Activity" ##change column name
 
 actid = mutate(appendact, id=1:10299) ##add id column
 volid = mutate(appendvol, id=1:10299) ##add id column
 dataid = mutate(appendata, id=1:10299) ##add id column
 
 merge1 = merge(actid, volid,by.x="id",by.y="id",all=TRUE) ##merge activity and volunteer dataframes
-merge2 = merge(merge1, dataid,by.x="id",by.y="id",all=TRUE) ##merge data and merged dataframes
+merge2 = merge(merge1, dataid,by.x="id",by.y="id",all=TRUE) ##merge dataid and merged dataframes
 
 convertbl <- tbl_df(merge2) ## convert table to tbl
 rm("merge2") ## remove other handle
-meanstdtbl <- select(convertbl, Volunteer_ID, Activity_ID, contains("mean"), contains("std")) ##Extracts only the measurements on the mean and standard deviation for each measurement. 
+meanstdtbl <- select(convertbl, Volunteer_ID, Activity, contains(".mean."), contains("std")) ##extract only mean and standard deviation, not meanFreq etc..  
 
+activities = read.table("./activity_labels.txt") ##read activities dataframe
+meanstdtbl[["Activity"]] <- activities[ match(meanstdtbl[['Activity']], activities[['V1']] ) , 'V2'] ##convert activity ids to labels in dataframe
 
-Uses descriptive activity names to name the activities in the data set
-From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
-
-
-
-bob <- data.frame(bob = c(1,2,3,4,5), id = 1:5)
-tom <- data.frame(tom = c(5,6,7,8,9), id = 1:5)
-
-merge1 <- merge(bob, tom, by.x = "id", by.y ="id", all = TRUE) ##merge side by side
-
-bob <- data.frame(V1 = c(1,2,3,4,5))
-tom <- data.frame(V1 = c(5,6,7,8,9))
-
-rbindtest <- rbind(bob, tom) ##append end to end
-
-headernames = c("first", "second")
-headernames = data.frame(X1 = c("first", "second"))
-
-
-colnames(rbindtest) <- headernames ## changes colnames to list
-
+tidytable <- meanstdtbl %>% group_by(Volunteer_ID, Activity) %>% summarise_each(funs(mean)) ##group meansstdtbl by chosen columns then apply mean function to remaining columns 
+write.table(tidytable, "tidytable.txt", row.names = FALSE) ##write tidytable to txt file
 
 

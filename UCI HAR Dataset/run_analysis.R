@@ -47,7 +47,7 @@ convertbl <- tbl_df(merge2) ## convert data frame to tbl
 rm("merge2") ## remove other handle
 meanstdtbl <- select(convertbl, Volunteer_ID, Activity, contains(".mean."), contains("std")) ##extract only mean and standard deviation, not meanFreq etc..  
 
-meanstdtbl[["Activity"]] <- activities[ match(meanstdtbl[['Activity']], activities[['V1']] ) , 'V2'] ##convert activity ids to labels in data frame
+meanstdtbl[["Activity"]] <- activities[ match(meanstdtbl[['Activity']], activities[['V1']] ) , 'V2'] ##convert activity ids to activity labels
 
 tidytable <- meanstdtbl %>% group_by(Volunteer_ID, Activity) %>% summarise_each(funs(mean)) ##group meansstdtbl by chosen columns then apply mean function to remaining columns 
 write.table(tidytable, "tidytable.txt", row.names = FALSE) ##write tidytable to txt file

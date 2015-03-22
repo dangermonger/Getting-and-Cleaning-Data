@@ -222,7 +222,7 @@ fBodyBodyAccJerkMag
 fBodyBodyGyroMag
 fBodyBodyGyroJerkMag
 
-Units
+### Units
 
 The acceleration signal from the accelerometer is measured in standard gravity units 'g'. The angular velocity vector is measured by the gyroscope for each window sample. The units are radians/second. 
 

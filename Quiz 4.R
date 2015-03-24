@@ -38,6 +38,10 @@ match_tables <- data.frame(matchcol = match(readedata[['CountryCode']], readgdp[
 
 length(grep("^Fiscal year end: June", match_tables$Junend))
 
+################################################Question 5######################################
 
-
+install.packages("quantmod")
+library(quantmod)
+amzn = getSymbols("AMZN",auto.assign=FALSE)
+sampleTimes = index(amzn) 
 
